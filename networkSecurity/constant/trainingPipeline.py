@@ -28,3 +28,14 @@ DATA_VALIDATION_VALID_DIR_NAME: str = "validated"
 DATA_VALIDATION_INVALID_DIR_NAME: str = "invalid"
 DATA_VALIDATION_DRIFT_REPORT_DIR_NAME: str = "driftReport"
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME: str = "report.yaml"
+
+# Data Transformation Constants
+DATA_TRANSFORMATION_DIR_NAME: str = "dataTransformation"
+DATA_TRANSFORMATION_TRANSFORMED_DIR_NAME: str = "transformed"
+DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR_NAME: str = "transformedObject"
+#KNN Imputer parameters for handling missing values
+DATA_TRANSFORMATION_IMPUTER_PARAMS: dict = {
+    "missing_values": np.nan,
+    "n_neighbors": 3,
+    "weights": "uniform",
+}
