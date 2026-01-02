@@ -6,7 +6,7 @@ from networkSecurity.logging.logger import logging
 from networkSecurity.entity.artifactEntity import ModelTrainerArtifact, ClassificationMetricArtifact, DataTransformationArtifact
 from sklearn.metrics import precision_score, recall_score, f1_score
 from sklearn.metrics import accuracy_score
-import pickle
+import mlflow
 
 from networkSecurity.utils.mlUtils.model.estimator import NetworkModel
 from networkSecurity.utils.mainUtils.utils import load_numpy_array_data, save_object, load_object
@@ -28,6 +28,28 @@ class ModelTrainer:
             self.data_transformation_artifact = data_transformation_artifact
         except Exception as e:
             raise NetworkSecurityException(e, sys) from e
+        
+    def track_mlflow(self, model_name: str, model, train_metric, test_metric):
+        mlflow.set_experiment("NetworkSecurity_Classification")
+    
+        with mlflow.start_run(run_name=model_name):
+        
+            # Log params
+            mlflow.log_param("model_name", model_name)
+    
+            # Train metrics
+            mlflow.log_metric("train_precision", train_metric.precision_score)
+            mlflow.log_metric("train_recall", train_metric.recall_score)
+            mlflow.log_metric("train_f1_score", train_metric.f1_score)
+    
+            # Test metrics
+            mlflow.log_metric("test_precision", test_metric.precision_score)
+            mlflow.log_metric("test_recall", test_metric.recall_score)
+            mlflow.log_metric("test_f1_score", test_metric.f1_score)
+    
+            # Log model
+            mlflow.sklearn.log_model(model, artifact_path="model")
+
         
     def train_model(self, x_train, y_train, x_test, y_test):
         models = {
@@ -82,6 +104,14 @@ class ModelTrainer:
         # Test metrics ✅ MOVED UP
         y_test_pred = best_model.predict(x_test)
         test_metric = get_classification_score(y_true=y_test, y_pred=y_test_pred)
+
+        # track mlflow
+        self.track_mlflow(
+            model_name=best_model_name,
+            model=best_model,
+            train_metric=train_metric,
+            test_metric=test_metric
+        )
 
         preprocessor_obj = load_object(
             file_path=self.data_transformation_artifact.transformed_object_file_path
