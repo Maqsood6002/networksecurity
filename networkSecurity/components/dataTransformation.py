@@ -76,6 +76,8 @@ class dataTransformation:
             preprocessing_object_file_path = self.data_transformation_config.transformed_object_file_path
             save_object(file_path=preprocessing_object_file_path, obj=preprocessing_pipeline)
 
+            save_object("finalModel/preprocessor.pkl",preprocessing_pipeline)
+
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_train_file_path=transformed_train_file_path,
                 transformed_test_file_path=transformed_test_file_path,

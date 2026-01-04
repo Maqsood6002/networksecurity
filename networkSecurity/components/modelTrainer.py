@@ -18,6 +18,8 @@ from sklearn.metrics import r2_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+import dagshub
+dagshub.init(repo_owner='Maqsood6002', repo_name='networksecurity', mlflow=True)
 
 class ModelTrainer:
     def __init__(self, model_trainer_config: ModelTrainerConfig,
@@ -31,22 +33,22 @@ class ModelTrainer:
         
     def track_mlflow(self, model_name: str, model, train_metric, test_metric):
         mlflow.set_experiment("NetworkSecurity_Classification")
-    
+
         with mlflow.start_run(run_name=model_name):
-        
+
             # Log params
             mlflow.log_param("model_name", model_name)
-    
+
             # Train metrics
             mlflow.log_metric("train_precision", train_metric.precision_score)
             mlflow.log_metric("train_recall", train_metric.recall_score)
             mlflow.log_metric("train_f1_score", train_metric.f1_score)
-    
+
             # Test metrics
             mlflow.log_metric("test_precision", test_metric.precision_score)
             mlflow.log_metric("test_recall", test_metric.recall_score)
             mlflow.log_metric("test_f1_score", test_metric.f1_score)
-    
+
             # Log model
             mlflow.sklearn.log_model(model, artifact_path="model")
 
@@ -125,6 +127,8 @@ class ModelTrainer:
             file_path=self.model_trainer_config.trained_model_file_path,
             obj=model_obj
         )
+
+        save_object("finalModel/model.pkl",best_model)
 
         model_trainer_artifact = ModelTrainerArtifact(
             trained_model_file_path=self.model_trainer_config.trained_model_file_path,
